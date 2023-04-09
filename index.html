@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Live Class</title>
+  <style>
+    /* Add styles for the video chat interface */
+  </style>
+</head>
+<body>
+  <div id="room-container">
+    <form id="join-room-form">
+      <label for="room-id">Enter Room ID:</label>
+      <input type="text" id="room-id" name="room-id" required>
+      <label for="user-id">Enter User ID:</label>
+      <input type="text" id="user-id" name=" user-id" required>
+      
+      <button type="submit">Join Room</button>
+</form>
+</div>
+
+<div id="video-container">
+<div id="local-video">
+  <video id="local-video-stream" autoplay muted></video>
+</div>
+
+<div id="remote-videos"></div>
+
+<div id="chat-container">
+  <ul id="chat-messages"></ul>
+  <form id="chat-form">
+    <input type="text" id="chat-input" name="chat-input" autocomplete="off" required>
+    <button type="submit">Send</button>
+  </form>
+</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const roomId = window.location.pathname.slice(1);
+const userId = Math.random().toString(36).substring(7);
+
+// Join the room and display video and chat interface
+socket.emit('join-room', roomId, userId);
+
+const joinRoomForm = document.getElementById('join-room-form');
+const videoContainer = document.getElementById('video-container');
+
+joinRoomForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const userIdInput = document.getElementById('user-id');
+  window.location.href = `/${roomId}?userId=${userIdInput.value}`;
+});
+
+// Handle user connections and disconnections
+socket.on('user-connected', (userId) => {
+  console.log(`User ${userId} connected`);
+});
+
+socket.on('user-disconnected', (userId) => {
+  console.log(`User ${userId} disconnected`);
+});
+
+// Handle screen sharing
+const shareScreenButton = document.getElementById('share-screen-button');
+const stopShareScreenButton = document.getElementById('stop-share-screen-button');
+
+shareScreenButton.addEventListener('click', () => {
+  socket.emit('share-screen');
+});
+
+stopShareScreenButton.addEventListener('click', () => {
+  socket.emit('stop-share-screen');
+});
+
+socket.on('user-shared-screen', (userId) => {
+  console.log(`User ${userId} started screen sharing`);
+});
+
+socket.on('user-stopped-sharing-screen', (userId) => {
+  console.log(`User ${userId} stopped screen sharing`);
+});
+
+// Handle video streams
+const localVideoStream = document.getElementById('local-video-stream');
+const remoteVideosContainer = document.getElementById('remote-videos');
+
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  .then((stream) => {
+    localVideoStream.srcObject = stream;
+    localVideoStream.muted = true;
+
+    socket.emit('stream', stream, userId);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
+socket.on('user-connected-video', (data) => {
+  const { userId, stream } = data;
+  const remoteVideo = document.createElement('video');
+  remoteVideo.id = `remote-video-${userId}`;
+  remoteVideo.srcObject = stream;
+  remoteVideo.autoplay = true;
+  remoteVideosContainer.appendChild(remoteVideo);
+});
+
+socket.on('user-disconnected-video', (userId) => {
+  const remoteVideo = document.getElementById(`remote-video-${userId}`);
+  if (remoteVideo) {
+    remoteVideo.remove();
+  }
+});
+
+// Handle chat messages
+const chatMessages = document.getElementById('chat-messages');
+const chatForm = document.getElementById('chat-form');
+const chatInput = document.getElementById('chat-input');
+
+chatForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const message = chatInput.value;
+  socket.emit('chat-message', message);
+  chatInput.value
+});
+
+socket.on('chat-message', (data) => {
+    const { userId, message } = data;
+    const chatMessage = document.createElement('li');
+    chatMessage.textContent = `[User ${userId}]: ${message}`;
+    chatMessages.appendChild(chatMessage);
+});
+</script>
