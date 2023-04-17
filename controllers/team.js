@@ -1,4 +1,3 @@
-const multer = require('multer');
 const Team = require('../models/Team');
 exports.addTeam = async (req, res, next) => {
 
