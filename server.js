@@ -7,6 +7,7 @@ const routes = require('./routes/index');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static('public'));
 
 const connectToDatabase = require('./config/dbConfig');
 connectToDatabase();

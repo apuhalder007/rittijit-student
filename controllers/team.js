@@ -1,6 +1,10 @@
+const multer = require('multer');
 const Team = require('../models/Team');
 exports.addTeam = async (req, res, next) => {
-    const { name, image, owner, homeStadium, captain, coach } = req.body;
+
+    const { name, owner, homeStadium, captain, coach } = req.body;
+    const image = req.file.path;
+    //console.log("file", req.file);
     const team = new Team({
         name,
         image,
