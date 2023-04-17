@@ -1,4 +1,4 @@
-const Team = require('../models/team');
+const Team = require('../models/Team');
 exports.addTeam = async (req, res, next) => {
     const { name, image, owner, homeStadium, captain, coach } = req.body;
     const team = new Team({

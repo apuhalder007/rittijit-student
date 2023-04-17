@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const config = require('./config/config');
+const port = config.host.port;
 
 const routes = require('./routes/index');
 
@@ -12,7 +13,7 @@ connectToDatabase();
 
 app.use('/', routes);
 
-
+console.log(process.env.NODE_ENV, port);
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
