@@ -6,6 +6,8 @@ if (process.env.NODE_ENV === 'development') {
 dotenv.config({ path: './environments/.env.staging' });
 } else if (process.env.NODE_ENV === 'production') {
 dotenv.config({ path: './environments/.env.production' });
+}else{
+    dotenv.config({ path: './environments/.env' });
 }
 
 const config = {
