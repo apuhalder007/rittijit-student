@@ -9,6 +9,8 @@ const AwardRouter = require('./award');
 
 const bookCategoryRouter = require('./bookCategory');
 
+const bookRouter = require('./book');
+
 const router = express.Router();
 
 router.get('/', auth, todosController.getTodos);
@@ -22,5 +24,6 @@ router.use('/teams', auth, TeamRouter);
 router.use('/players', auth, PlayerRouter);
 router.use('/awards', auth, AwardRouter);
 router.use('/book', bookCategoryRouter);
+router.use('/', bookRouter);
 
 module.exports = router;
