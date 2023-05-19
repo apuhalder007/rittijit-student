@@ -4,6 +4,10 @@ const Schema = new mongoose.Schema({
         type: String,
         required: true
     },
+    descriptions: {
+        type: String,
+        default: ''
+    },
     author: {
         type: String,
         required: true
@@ -15,6 +19,11 @@ const Schema = new mongoose.Schema({
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category'
+    },
+    status: {
+        type: String,
+        enum: ['active', 'inactive'], 
+        default: 'active'
     },
     createdAt: {
         type: Date,

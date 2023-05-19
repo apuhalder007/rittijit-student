@@ -18,6 +18,7 @@ exports.register = async (req, res) => {
 exports.login  = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log(req.body, "login data!");
         const user = await User.findOne({ email });
         if (!user) {
           return res.status(401).json({ message: 'Invalid email or password' });
@@ -26,7 +27,7 @@ exports.login  = async (req, res) => {
         if (!isMatch) {
           return res.status(401).json({ message: 'Invalid email or password' });
         }
-        const token = jwt.sign({ userId: user._id, email: user.email }, config.jwt.secret, { expiresIn: config.jwt.expiresIn });
+        const token = jwt.sign({ userId: user._id, email: user.email }, config.jwt.secret, { expiresIn: 36000 });
         res.json({ token });
       } catch (err) {
         res.status(400).json({ message: err.message });

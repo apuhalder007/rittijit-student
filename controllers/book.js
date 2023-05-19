@@ -12,6 +12,18 @@ exports.getBooks = async (req, res) => {
     }
 }
 
+exports.getBook = async (req, res) => {
+    try {
+        const book = await Book.find({ _id: req.params.id});
+        res.status(200).json({
+        book,
+        message: 'Book fetched successfully'
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
 exports.getBooksByCategory = async (req, res) => {
     try {
         const books = await Book.find({ category: req.params.id }).populate('category');
@@ -58,4 +70,39 @@ exports.addBook = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
     
+}
+
+exports.updateBook = async (req, res) => {
+    const _id = req.params.id;
+    const { name, descriptions, author, publisher, category, status } = req.body;
+    try{
+        const bookUpdate = await Book.findByIdAndUpdate(_id, {
+            name,
+            descriptions,
+            author,
+            publisher,
+            category,
+            status
+        });
+
+        res.status(201).json({ 
+            message: 'Book updated successfully' ,
+            book: bookUpdate
+        });
+    }catch(err){
+        res.status(500).json({ message: err.message });
+    }
+} 
+
+exports.deleteBook = async (req, res) => {
+    const _id = req.params.id;
+    try{
+        const bookDelete = await Book.findByIdAndDelete(_id);
+        res.status(201).json({ 
+            message: 'Book deleted successfully' ,
+            book: bookDelete
+        });
+    }catch(err){
+        res.status(500).json({ message: err.message });
+    }
 }
